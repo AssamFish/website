@@ -1,1 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>祝妈妈生日快乐！</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style type="text/tailwindcss">
+        body {
+            font-family: 'Inter', sans-serif;
+            /* Custom scrollbar styling */
+            .no-scrollbar::-webkit-scrollbar {
+                display: none;
+            }
+            .no-scrollbar {
+                -ms-overflow-style: none;  /* IE and Edge */
+                scrollbar-width: none;  /* Firefox */
+            }
+        }
+        /* Custom class for Chinese font */
+        .font-chinese {
+            font-family: 'Noto Sans SC', 'Inter', sans-serif;
+        }
+
+        /* Additional style for images to prevent layout shift */
+        .photo-item img {
+            min-width: 100px; 
+        }
+
+        /* Bloom effect for photos */
+        .photo-item-bloom {
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2), 0 6px 6px rgba(0, 0, 0, 0.23); /* Enhanced shadow */
+        }
+    </style>
+</head>
+<body class="bg-rose-50 text-stone-700 flex flex-col items-center min-h-screen overflow-x-hidden selection:bg-pink-300 selection:text-white">
+
+    <div class="text-center py-8 px-4 mt-6">
+        <h1 class="font-chinese text-3xl sm:text-4xl md:text-5xl font-light text-pink-600 bg-white/60 backdrop-blur-sm p-4 sm:p-6 rounded-xl shadow-lg inline-block">
+            祝妈妈生日快乐
+        </h1>
+    </div>
+
+    <div class="w-full overflow-x-auto py-8 sm:py-12 no-scrollbar" id="photoAlbumContainer">
+        <div class="flex space-x-4 sm:space-x-6 px-4 sm:px-6 min-w-max" id="photoStrip">
+            </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const photoStrip = document.getElementById('photoStrip');
+            const photoAlbumContainer = document.getElementById('photoAlbumContainer');
+
+            // --- Updated Photo Configuration ---
+            // These are the GitHub URLs you provided.
+            const imagePaths = [
+                'https://github.com/AssamFish/website/blob/main/mamabirhtday2025/0.jpg?raw=true',
+                'https://github.com/AssamFish/website/blob/main/mamabirhtday2025/1.jpg?raw=true',
+                'https://github.com/AssamFish/website/blob/main/mamabirhtday2025/2.jpeg?raw=true',
+                'https://github.com/AssamFish/website/blob/main/mamabirhtday2025/3.jpg?raw=true',
+                'https://github.com/AssamFish/website/blob/main/mamabirhtday2025/4.jpg?raw=true',
+                'https://github.com/AssamFish/website/blob/main/mamabirhtday2025/5.jpg?raw=true',
+                'https://github.com/AssamFish/website/blob/main/mamabirhtday2025/6.jpg?raw=true'
+            ];
+
+            // Determine which image paths to use (user-defined or placeholders)
+            // This logic will now directly use your provided GitHub URLs.
+            const useUserImages = imagePaths.some(path => path.trim() !== ''); // Check if any path is not empty
+            const finalImagePaths = useUserImages
+                ? imagePaths.filter(path => path.trim() !== '') 
+                : [ // Default placeholders if imagePaths array was empty (should not happen with your new links)
+                    'https://placehold.co/400x560/fce7f3/9d174d?text=生日快乐+!',
+                    'https://placehold.co/420x560/fce7f3/9d174d?text=温馨时刻+2',
+                    'https://placehold.co/380x560/fce7f3/9d174d?text=美好回忆+3',
+                  ];
+
+            if (finalImagePaths.length === 0) {
+                const placeholderMessage = document.createElement('p');
+                placeholderMessage.textContent = '请在脚本中添加您的照片路径 (Please add your photo paths in the script).';
+                placeholderMessage.className = 'text-center text-stone-500 italic p-10';
+                photoStrip.appendChild(placeholderMessage);
+            } else {
+                finalImagePaths.forEach((path, index) => {
+                    const photoItem = document.createElement('div');
+                    // Base Tailwind classes for each photo item
+                    photoItem.className = "photo-item flex-shrink-0 h-64 sm:h-72 md:h-80 lg:h-96 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 ease-out overflow-hidden opacity-0 transform translate-y-5 cursor-pointer";
+                    
+                    const img = document.createElement('img');
+                    img.src = path;
+                    img.onerror = function() {
+                        this.onerror=null; 
+                        this.src='https://placehold.co/400x560/FDF2F8/44403C?text=图片加载失败';
+                        this.alt='Image not found / 图片加载失败';
+                    };
+                    img.alt = `美好的回忆 ${index + 1}`; 
+                    img.className = "h-full w-auto object-cover block rounded-xl"; 
+                    
+                    photoItem.appendChild(img);
+                    photoStrip.appendChild(photoItem);
+
+                    // Add click event listener for bloom effect
+                    photoItem.addEventListener('click', function() {
+                        this.classList.add('photo-item-bloom');
+                        // Remove the bloom effect after a short delay
+                        setTimeout(() => {
+                            this.classList.remove('photo-item-bloom');
+                        }, 300); // Duration of the bloom effect (matches transition duration)
+                    });
+                });
+            }
+
+            // Fade-in transition on scroll for photo items
+            const photosToObserve = document.querySelectorAll('.photo-item');
+
+            if (photosToObserve.length > 0) {
+                const observerOptions = {
+                    root: photoAlbumContainer, 
+                    rootMargin: '0px 0px 0px 0px', 
+                    threshold: 0.15 
+                };
+
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.style.transitionDuration = '700ms'; 
+                            entry.target.classList.remove('opacity-0', 'translate-y-5');
+                            entry.target.classList.add('opacity-100', 'translate-y-0');
+                        }
+                    });
+                }, observerOptions);
+
+                photosToObserve.forEach(photo => {
+                    observer.observe(photo);
+                });
+            }
+        });
+    </script>
+
+</body>
+</html>
 
