@@ -65,9 +65,7 @@ body {
     padding:6px;
     border-bottom: 1px solid;
     display: flex;
-    flex-direction: column;
-    background-color: ;
-    
+    flex-direction: column;    
 }
 
 .WE {
